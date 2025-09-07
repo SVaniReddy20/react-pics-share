@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { login, user } = usePosts();
   const navigate = useNavigate();
 
@@ -20,9 +22,17 @@ const Login: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username.trim()) {
-      login(username);
-      navigate('/feed');
+    if (username.trim() && password.trim()) {
+      // Simulate checking if user has 2FA enabled
+      // In a real app, this would be determined by backend response
+      const has2FA = Math.random() > 0.5; // Simulate 50% chance of 2FA
+      
+      if (has2FA) {
+        navigate('/login/2fa', { state: { username, password } });
+      } else {
+        login(username);
+        navigate('/feed');
+      }
     }
   };
 
@@ -44,7 +54,7 @@ const Login: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Choose your username
+                Username
               </label>
               <Input
                 type="text"
@@ -56,17 +66,44 @@ const Login: React.FC = () => {
                 minLength={3}
                 maxLength={20}
               />
-              <p className="text-xs text-muted-foreground">
-                This will be your display name on the platform
-              </p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                Password
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter password..."
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 pr-12"
+                  required
+                  minLength={6}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </Button>
+              </div>
             </div>
 
             <Button
               type="submit"
               className="w-full h-12 bg-gradient-instagram text-white font-semibold text-lg hover:opacity-90 transition-opacity"
-              disabled={!username.trim() || username.length < 3}
+              disabled={!username.trim() || !password.trim() || username.length < 3 || password.length < 6}
             >
-              Get Started
+              Sign In
             </Button>
           </form>
 

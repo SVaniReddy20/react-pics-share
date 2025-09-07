@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { PostsProvider } from "@/context/PostsContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
+import TwoFactorAuth from "./pages/TwoFactorAuth";
 import Feed from "./pages/Feed";
 import Upload from "./pages/Upload";
 import Profile from "./pages/Profile";
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/feed" replace />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/login/2fa" element={<TwoFactorAuth />} />
             <Route path="/feed" element={
               <ProtectedRoute>
                 <Feed />

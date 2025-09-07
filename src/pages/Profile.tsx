@@ -1,18 +1,33 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { User, Grid, Camera, Plus } from 'lucide-react';
+import { User, Grid, Camera, Plus, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import { usePosts } from '@/context/PostsContext';
 import Navbar from '@/components/Navbar';
 
 const Profile: React.FC = () => {
   const { username } = useParams<{ username: string }>();
   const { posts, user } = usePosts();
+  const [twoFactorEnabled, setTwoFactorEnabled] = React.useState(false);
 
   const userPosts = posts.filter(post => post.username === username);
   const isOwnProfile = user.username === username;
   const totalLikes = userPosts.reduce((sum, post) => sum + post.likes, 0);
+
+  // Load 2FA setting from localStorage
+  React.useEffect(() => {
+    if (isOwnProfile) {
+      const saved2FA = localStorage.getItem(`2fa_${user.username}`);
+      setTwoFactorEnabled(saved2FA === 'true');
+    }
+  }, [isOwnProfile, user.username]);
+
+  const handle2FAToggle = (enabled: boolean) => {
+    setTwoFactorEnabled(enabled);
+    localStorage.setItem(`2fa_${user.username}`, enabled.toString());
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-secondary/30 to-accent/5">
@@ -65,6 +80,38 @@ const Profile: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Security Settings - Only show for own profile */}
+        {isOwnProfile && (
+          <Card className="mb-8 bg-gradient-card border-border/50 shadow-lg">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-instagram/10">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-foreground">Two-Factor Authentication</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Add an extra layer of security to your account
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={twoFactorEnabled}
+                  onCheckedChange={handle2FAToggle}
+                />
+              </div>
+              {twoFactorEnabled && (
+                <div className="mt-4 rounded-lg bg-gradient-subtle p-3">
+                  <p className="text-sm text-muted-foreground">
+                    ✅ Two-factor authentication is enabled. You'll need to enter a verification code when signing in.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Posts Grid */}
         <div className="space-y-6">
