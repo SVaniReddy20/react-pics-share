@@ -57,6 +57,15 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom Instagram-inspired colors
+        "like-heart": "hsl(var(--like-heart))",
+        "story-ring": "hsl(var(--story-ring))",
+        "online-status": "hsl(var(--online-status))",
+      },
+      backgroundImage: {
+        'gradient-instagram': 'var(--gradient-instagram)',
+        'gradient-subtle': 'var(--gradient-subtle)',
+        'gradient-card': 'var(--gradient-card)',
       },
       borderRadius: {
         lg: "var(--radius)",
